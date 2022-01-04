@@ -1,12 +1,17 @@
-FROM golang:latest
+# syntax=docker/dockerfile:1
 
-RUN mkdir /build
-WORKDIR /build
+FROM golang:1.16-alpine
 
-RUN export GO111MODULE=on
-RUN go get github.com/Ewaoche/go-restapi-container
-RUN cd /build && clone https://github.com/Ewaoche/go-restapi-container.git
-RUN cd /build/go-restapi-container.git/main && go build
+WORKDIR /app
+
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+
+COPY *.go ./
+
+RUN go build -o /docker-gs-ping
+
 EXPOSE 8080
 
-ENTRYPOINT [ "/build/go-restapi-container.git/main" ]
+CMD [ "/docker-gs-ping" ]
